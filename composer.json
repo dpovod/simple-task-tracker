@@ -1,0 +1,10 @@
+{
+  "name":"Simple Task Tracker",
+  "description":"Simple Task Tracker",
+  "require": {
+    "vlucas/phpdotenv": "^4.1"
+  },
+  "autoload": {
+    "psr-4": {"App\\": "App/"}
+  }
+}
