@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Http\Routing;
 
+use App\Http\Controller\AuthController;
 use App\Http\Controller\HomeController;
 
 /**
@@ -18,6 +19,7 @@ class RouteStorage
     {
         $this->routes = [
             new Route('home', 'GET', '/', HomeController::class, 'index'),
+            new Route('registration-form', 'GET', '/auth/register', AuthController::class, 'registrationForm'),
         ];
     }
 

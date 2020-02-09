@@ -1,8 +1,10 @@
 {
-  "name":"Simple Task Tracker",
+  "name":"dpovod/simple-task-tracker",
   "description":"Simple Task Tracker",
   "require": {
-    "vlucas/phpdotenv": "^4.1"
+    "vlucas/phpdotenv": "^4.1",
+    "ext-pdo": "*",
+    "ext-json": "*"
   },
   "autoload": {
     "psr-4": {"App\\": "App/"}

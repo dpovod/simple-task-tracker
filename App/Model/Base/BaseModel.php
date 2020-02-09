@@ -5,6 +5,9 @@ namespace App\Model\Base;
 
 use App\Exception\Model\AttributeNotExistsException;
 use App\Exception\Model\FieldTypeNotAllowedException;
+use DateTimeImmutable;
+use DateTimeZone;
+use Exception;
 
 /**
  * Class BaseModel
@@ -34,7 +37,7 @@ class BaseModel
     private const DEFAULT_FIELD_TYPE = self::FIELD_TYPE_STRING;
 
     /** @var array */
-    protected  $schema;
+    protected $schema;
 
     /** @var string */
     protected const TABLE = 'forge';
@@ -59,7 +62,7 @@ class BaseModel
      * @param $attributeValue
      * @return mixed
      * @throws FieldTypeNotAllowedException
-     * @throws \Exception
+     * @throws Exception
      */
     private function castAttribute(string $attributeName, $attributeValue)
     {
@@ -67,7 +70,7 @@ class BaseModel
 
         if (!$this->isAllowedFieldType($fieldType)) {
             throw new FieldTypeNotAllowedException(
-                "Field type '$fieldType' is not allowed for table '$this->table_name'."
+                sprintf("Field type '%s' is not allowed for table '%s'.", $fieldType, self::TABLE)
             );
         }
 
@@ -77,9 +80,9 @@ class BaseModel
             case self::FIELD_TYPE_BOOL:
                 return (bool)$attributeValue;
             case self::FIELD_TYPE_DATETIME:
-                return new \DateTimeImmutable($attributeValue, new \DateTimeZone('UTC'));
+                return new DateTimeImmutable($attributeValue, new DateTimeZone('UTC'));
             case self::FIELD_TYPE_JSON:
-                return json_decode($attributeValue);
+                return json_decode($attributeValue, true);
             default:
                 return (string)$attributeValue;
         }
@@ -95,6 +98,22 @@ class BaseModel
     }
 
     /**
+     * @return array
+     */
+    public function getAttributesKeys(): array
+    {
+        return array_keys($this->attributes);
+    }
+
+    /**
+     * @return array
+     */
+    public function getAttributes(): array
+    {
+        return $this->attributes;
+    }
+
+    /**
      * @param string $attribute
      * @return mixed
      * @throws AttributeNotExistsException
@@ -106,5 +125,15 @@ class BaseModel
         }
 
         return $this->attributes[$attribute];
+    }
+
+    /**
+     * @param string $attribute
+     * @param $value
+     * @throws FieldTypeNotAllowedException
+     */
+    public function set(string $attribute, $value)
+    {
+        $this->attributes[$attribute] = $this->castAttribute($attribute, $value);
     }
 }

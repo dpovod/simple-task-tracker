@@ -4,6 +4,9 @@ declare(strict_types=1);
 namespace App\Repository\Base;
 
 use App\Model\Base\BaseModel;
+use PDO;
+use PDOException;
+use ReflectionException;
 
 /**
  * Class BaseRepository
@@ -11,6 +14,10 @@ use App\Model\Base\BaseModel;
  */
 class BaseRepository
 {
+    public const CONDITION_AND = 'AND';
+
+    public const CONDITION_OR = 'OR';
+
     /** @var string */
     protected $table;
 
@@ -23,7 +30,7 @@ class BaseRepository
     }
 
     /**
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
     protected function getTable()
     {
@@ -33,14 +40,14 @@ class BaseRepository
     }
 
     /**
-     * @var \PDO
+     * @var PDO
      */
     protected $connection;
 
     /**
      * BaseRepository constructor.
-     * @throws \PDOException
-     * @throws \ReflectionException
+     * @throws PDOException
+     * @throws ReflectionException
      */
     public function __construct()
     {
@@ -51,13 +58,14 @@ class BaseRepository
         $user = getenv('DB_USER');
         $password = getenv('DB_PASS');
 
-        $this->connection = new \PDO($dsn, $user, $password);
+        $this->connection = new PDO($dsn, $user, $password);
+        $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     }
 
     /**
      * @param array $row
      * @return BaseModel
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
     private function createModelInstance(array $row)
     {
@@ -71,7 +79,7 @@ class BaseRepository
     /**
      * @param array $rows
      * @return BaseModel[]
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
     private function createModelInstances(array $rows)
     {
@@ -88,21 +96,54 @@ class BaseRepository
      * @param int $limit
      * @param int $offset
      * @return array
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
     public function getList(int $limit, int $offset)
     {
         $query = "SELECT * FROM `{$this->table}` LIMIT :limit OFFSET :offset";
         $statement = $this->connection->prepare($query);
-        $statement->bindValue('limit', $limit, \PDO::PARAM_INT);
-        $statement->bindValue('offset', $offset, \PDO::PARAM_INT);
+        $statement->bindValue('limit', $limit, PDO::PARAM_INT);
+        $statement->bindValue('offset', $offset, PDO::PARAM_INT);
         $statement->execute();
-        $rows = $statement->fetchAll(\PDO::FETCH_ASSOC);
+        $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
 
-        if (!$rows) {
-            return [];
-        }
+        return !$rows ? [] : $this->createModelInstances($rows);
+    }
 
-        return $this->createModelInstances($rows);
+    /**
+     * @param BaseModel $model
+     * @return bool
+     */
+    public function insert(BaseModel $model)
+    {
+        $columns = $model->getAttributesKeys();
+        $placeholders = array_fill(0, count($columns), '?');
+        $columnsString = implode(',', $columns);
+        $placeholdersString = implode(',', $placeholders);
+        $query = "INSERT INTO `{$this->table}` ($columnsString) VALUES ($placeholdersString)";
+        $statement = $this->connection->prepare($query);
+
+        return $statement->execute(array_values($model->getAttributes()));
+    }
+
+    /**
+     * @param array $wheres
+     * @param string $condition
+     * @return BaseModel[]|array
+     * @throws ReflectionException
+     */
+    public function findWhere(array $wheres, string $condition = self::CONDITION_AND)
+    {
+        $wheresColumns = array_map(function ($column) {
+            return " `$column` = ? ";
+        }, array_keys($wheres));
+
+        $whereClause = implode($condition, $wheresColumns);
+        $query = "SELECT * FROM `{$this->table}` WHERE $whereClause";
+        $statement = $this->connection->prepare($query);
+        $statement->execute(array_values($wheres));
+        $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+        return !$rows ? [] : $this->createModelInstances($rows);
     }
 }
