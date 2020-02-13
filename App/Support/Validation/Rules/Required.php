@@ -6,10 +6,10 @@ namespace App\Support\Validation\Rules;
 use App\Support\Validation\Rules\Base\Rule;
 
 /**
- * Class Number
+ * Class Required
  * @package App\Support\Validation\Rules
  */
-class Number extends Rule
+class Required extends Rule
 {
     /**
      * @param $value
@@ -21,6 +21,14 @@ class Number extends Rule
     {
         parent::validate($value, $field);
 
-        return is_numeric($value);
+        return array_key_exists($field, $fields);
+    }
+
+    /**
+     * @return string
+     */
+    public function errorMessage(): string
+    {
+        return sprintf("Field '%s' is required.", $this->field);
     }
 }

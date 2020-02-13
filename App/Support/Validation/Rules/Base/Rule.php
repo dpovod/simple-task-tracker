@@ -23,9 +23,10 @@ class Rule implements RuleInterface
     /**
      * @param $value
      * @param string $field
+     * @param array $fields
      * @return bool
      */
-    public function validate($value, string $field): bool
+    public function validate($value, string $field, array $fields = []): bool
     {
         $this->field = $field;
 

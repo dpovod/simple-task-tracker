@@ -1,11 +1,13 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Support\Validation\Rules\Base;
+namespace App\Support\Validation\Rules;
+
+use App\Support\Validation\Rules\Base\Rule;
 
 /**
  * Class StringLength
- * @package App\Support\Validation\Rules\Base
+ * @package App\Support\Validation\Rules
  */
 class StringLength extends Rule
 {
@@ -29,9 +31,10 @@ class StringLength extends Rule
     /**
      * @param $value
      * @param string $field
+     * @param array $fields
      * @return bool
      */
-    public function validate($value, string $field): bool
+    public function validate($value, string $field, array $fields = []): bool
     {
         parent::validate($value, $field);
         $isString = is_string($value);
@@ -56,7 +59,7 @@ class StringLength extends Rule
     public function errorMessage(): string
     {
         return sprintf(
-            "Field '%s' must be a string with a length of %n to %n characters.",
+            "Field '%s' must be a string with a length of %d to %d characters.",
             $this->field,
             $this->min_length,
             $this->max_length

@@ -9,6 +9,9 @@ use App\Exception\Validation\ValidationException;
 use App\Model\User;
 use App\Repository\Base\BaseRepository;
 use App\Repository\UserRepository;
+use App\Support\Validation\Rules\Email;
+use App\Support\Validation\Rules\Required;
+use App\Support\Validation\Rules\StringLength;
 use App\Support\Validation\Validator;
 use ReflectionException;
 use RuntimeException;
@@ -35,12 +38,16 @@ class UserService
             throw new RuntimeException('Salt is empty.', 500);
         }
 
-        $password = $user->get('password');
-        $password = password_hash($password, PASSWORD_BCRYPT, ['salt' => $salt]);
-        $user->set('password', $password);
-        $validator = new Validator();
+        $validator = new Validator($user->getAttributes());
 
-        $validator = $validator->setCallback(function ($user) use ($validator) {
+        $validator->setRules([
+            'email' => [new Required(), new Email()],
+            'login' => [new Required(), new StringLength(4, 10)],
+            'password' => [new Required(), new StringLength(8, 20)],
+        ]);
+
+        $validator = $validator->setCallback(function ($validator) use ($user) {
+            /** @var Validator $validator */
             /** @var User $user */
             /** @var User[] $existingUsers */
             $existingUsers = (new UserRepository())->findWhere(
@@ -50,18 +57,22 @@ class UserService
 
             foreach ($existingUsers as $existingUser) {
                 if ($existingUser->get('email') === $user->get('email')) {
-                    $validator->addError('User with email already exists.');
+                    $validator->addError('email', sprintf("User with email '%s' already exists.", $user->get('email')));
                 }
 
                 if ($existingUser->get('login') === $user->get('login')) {
-                    $validator->addError('User with login already exists.');
+                    $validator->addError('login', sprintf("User with login '%s' already exists.", $user->get('login')));
                 }
             }
         });
 
         if (!$validator->isValid()) {
-            throw new ValidationException($validator->getErrors()[0]);
+            throw new ValidationException($validator->getFirstError());
         }
+
+        $password = $user->get('password');
+        $password = password_hash($password, PASSWORD_BCRYPT, ['salt' => $salt]);
+        $user->set('password', $password);
 
         return (new UserRepository())->insert($user);
     }
