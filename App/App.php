@@ -25,6 +25,8 @@ class App
         $routeStorage = new RouteStorage();
         $routeStorage->init();
 
+        $request->setRouteStorage($routeStorage);
+
         $routeRegistrant = new RouteRegistrar();
         $routeRegistrant->registerRoutes($routeStorage->getRoutes());
 

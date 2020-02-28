@@ -20,6 +20,7 @@ class RouteStorage
         $this->routes = [
             new Route('home', 'GET', '/', HomeController::class, 'index'),
             new Route('registration-form', 'GET', '/auth/register', AuthController::class, 'registrationForm'),
+            new Route('registration', 'POST', '/auth/register', AuthController::class, 'registration'),
         ];
     }
 
@@ -29,5 +30,20 @@ class RouteStorage
     public function getRoutes(): array
     {
         return $this->routes;
+    }
+
+    /**
+     * @param string $name
+     * @return Route|null
+     */
+    public function getRoute(string $name): ?Route
+    {
+        foreach ($this->routes as $route) {
+            if ($route->getName() === $name) {
+                return $route;
+            }
+        }
+
+        return null;
     }
 }

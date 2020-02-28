@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Http\Request;
 
 use App\Exception\Http\MethodNotAllowedException;
+use App\Http\Routing\RouteStorage;
 
 /**
  * Class Request
@@ -20,17 +21,30 @@ class Request
         self::METHOD_POST,
     ];
 
+    /** @var string */
     private $uri;
 
+    /** @var string */
     private $method;
+
+    /** @var array */
+    private $getParams;
+
+    /** @var array */
+    private $postParams;
+
+    /** @var RouteStorage */
+    private $routeStorage;
 
     /**
      * Request constructor.
      * @param string $uri
      * @param string $method
+     * @param array $getParams
+     * @param array $postParams
      * @throws MethodNotAllowedException
      */
-    public function __construct(string $uri, string $method)
+    public function __construct(string $uri, string $method, array $getParams = [], array $postParams = [])
     {
         if (!$this->isMethodAllowed($method)) {
             throw new MethodNotAllowedException();
@@ -38,6 +52,8 @@ class Request
 
         $this->uri = $uri;
         $this->method = $method;
+        $this->getParams = $getParams;
+        $this->postParams = $postParams;
     }
 
     /**
@@ -50,7 +66,7 @@ class Request
         $method = $globalServer['REQUEST_METHOD'];
         $uri = $globalServer['REQUEST_URI'];
 
-        return new self($uri, $method);
+        return new self($uri, $method, $_GET, $_POST);
     }
 
     /**
@@ -76,5 +92,37 @@ class Request
     public function getMethod(): string
     {
         return $this->method;
+    }
+
+    /**
+     * @return array
+     */
+    public function getGetParams(): array
+    {
+        return $this->getParams;
+    }
+
+    /**
+     * @return array
+     */
+    public function getPostParams(): array
+    {
+        return $this->postParams;
+    }
+
+    /**
+     * @return RouteStorage
+     */
+    public function getRouteStorage(): RouteStorage
+    {
+        return $this->routeStorage;
+    }
+
+    /**
+     * @param RouteStorage $routeStorage
+     */
+    public function setRouteStorage(RouteStorage $routeStorage): void
+    {
+        $this->routeStorage = $routeStorage;
     }
 }

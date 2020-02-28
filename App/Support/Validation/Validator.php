@@ -48,6 +48,7 @@ class Validator
      */
     public function setRules(array $rules): self
     {
+        //@todo: check format of rules array
         $this->rules = $rules;
 
         return $this;
@@ -97,11 +98,11 @@ class Validator
     }
 
     /**
-     * @return string
+     * @return bool|string
      */
-    public function getFirstError(): string
+    public function getFirstError()
     {
-        return array_values($this->getErrors())[0][0];
+        return array_values($this->getErrors())[0][0] ?? false;
     }
 
     /**

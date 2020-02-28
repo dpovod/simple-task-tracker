@@ -33,7 +33,11 @@ class RouteResolver
     {
         foreach ($this->routeStorage->getRoutes() as $route) {
             if ($request->getUri() === $route->getUri() && $request->getMethod() === $route->getMethod()) {
-                return call_user_func([$route->getController(), $route->getAction()]);
+                if (!method_exists($route->getController(), $route->getAction())) {
+                    throw new NotFoundException();
+                }
+
+                return call_user_func([$route->getController(), $route->getAction()], $request);
             }
         }
 
