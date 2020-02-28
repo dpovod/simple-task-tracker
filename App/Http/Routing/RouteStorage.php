@@ -21,6 +21,8 @@ class RouteStorage
             new Route('home', 'GET', '/', HomeController::class, 'index'),
             new Route('registration-form', 'GET', '/auth/register', AuthController::class, 'registrationForm'),
             new Route('registration', 'POST', '/auth/register', AuthController::class, 'registration'),
+            new Route('login-form', 'GET', '/auth/login', AuthController::class, 'loginForm'),
+            new Route('login', 'POST', '/auth/login', AuthController::class, 'login'),
         ];
     }
 

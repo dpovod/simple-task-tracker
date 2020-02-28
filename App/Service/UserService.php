@@ -32,12 +32,6 @@ class UserService
      */
     public function register(User $user)
     {
-        $salt = getenv('APP_KEY');
-
-        if (empty($salt)) {
-            throw new RuntimeException('Salt is empty.', 500);
-        }
-
         $validator = new Validator($user->getAttributes());
 
         $validator->setRules([
@@ -71,9 +65,43 @@ class UserService
         }
 
         $password = $user->get('password');
-        $password = password_hash($password, PASSWORD_BCRYPT, ['salt' => $salt]);
+        $password = password_hash($password, PASSWORD_BCRYPT);
         $user->set('password', $password);
 
         return (new UserRepository())->insert($user);
+    }
+
+    /**
+     * @param string $login
+     * @param string $password
+     * @return bool
+     * @throws AttributeNotExistsException
+     * @throws ReflectionException
+     * @throws ValidationException
+     */
+    public function login(string $login, string $password)
+    {
+        $repository = new UserRepository();
+        $user = $repository->findFirstWhere(['login' => $login]);
+
+        /** @var User $user */
+        if ($user === null) {
+            throw new ValidationException('Incorrect login or password.');
+        }
+
+        if (password_verify($password, $user->get('password'))) {
+            session_start();
+            $_SESSION['auth_id'] = $user->get('id');
+
+            return true;
+        }
+
+        throw new ValidationException('Incorrect login or password.');
+    }
+
+    public function logout()
+    {
+        session_start();
+        unset($_SESSION['auth_id']);
     }
 }

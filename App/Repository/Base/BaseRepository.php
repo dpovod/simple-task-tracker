@@ -146,4 +146,17 @@ class BaseRepository
 
         return !$rows ? [] : $this->createModelInstances($rows);
     }
+
+    /**
+     * @param array $wheres
+     * @param string $condition
+     * @return BaseModel|null
+     * @throws ReflectionException
+     */
+    public function findFirstWhere(array $wheres, string $condition = self::CONDITION_AND): ?BaseModel
+    {
+        $models = $this->findWhere($wheres, $condition);
+
+        return $models ? $models[0] : null;
+    }
 }
