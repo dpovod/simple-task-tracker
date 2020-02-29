@@ -7,6 +7,7 @@ use App\Exception\Http\NotFoundException;
 use App\Exception\Model\AttributeNotExistsException;
 use App\Exception\Model\FieldTypeNotAllowedException;
 use App\Exception\Validation\ValidationException;
+use App\Http\Controller\Base\BaseController;
 use App\Http\Request\Request;
 use App\Http\Routing\Redirector;
 use App\Model\Issue;
@@ -19,7 +20,7 @@ use App\Service\UserService;
  * Class TaskController
  * @package App\Http\Controller
  */
-class IssueController
+class IssueController extends BaseController
 {
     /**
      * @throws \ReflectionException
@@ -30,9 +31,8 @@ class IssueController
         $users = (new UserRepository())->getList();
         //@todo: pagination
         $issues = (new IssueRepository())->findWhere(['author_id' => UserService::authUserId()]);
-        $contentView = BASE_PATH . '/views/issues/my-issues.phtml';
 
-        require_once BASE_PATH . '/views/layouts/master.phtml';
+        return $this->renderView(BASE_PATH . '/views/issues/my-issues.phtml', compact('users', 'issues'));
     }
 
     /**
@@ -44,9 +44,8 @@ class IssueController
         $users = (new UserRepository())->getList();
         //@todo: pagination
         $issues = (new IssueRepository())->findWhere(['assigned_to_id' => UserService::authUserId()]);
-        $contentView = BASE_PATH . '/views/issues/assigned-to-me.phtml';
 
-        require_once BASE_PATH . '/views/layouts/master.phtml';
+        return $this->renderView(BASE_PATH . '/views/issues/assigned-to-me.phtml', compact('users', 'issues'));
     }
 
     /**
@@ -56,9 +55,8 @@ class IssueController
     public function createIssueForm()
     {
         $users = (new UserRepository())->getList();
-        $contentView = BASE_PATH . '/views/issues/create.phtml';
 
-        require_once BASE_PATH . '/views/layouts/master.phtml';
+        return $this->renderView(BASE_PATH . '/views/issues/create.phtml', compact('users'));
     }
 
     /**

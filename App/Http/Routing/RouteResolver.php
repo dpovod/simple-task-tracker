@@ -37,7 +37,9 @@ class RouteResolver
                     throw new NotFoundException();
                 }
 
-                return call_user_func([$route->getController(), $route->getAction()], $request);
+                $className = $route->getController();
+                $controllerInstance = new $className;
+                $controllerInstance->{$route->getAction()}($request);
             }
         }
 

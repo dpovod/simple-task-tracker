@@ -6,6 +6,7 @@ namespace App\Http\Controller;
 use App\Exception\Http\NotFoundException;
 use App\Exception\Model\AttributeNotExistsException;
 use App\Exception\Validation\ValidationException;
+use App\Http\Controller\Base\BaseController;
 use App\Http\Request\Request;
 use App\Http\Routing\Redirector;
 use App\Model\User;
@@ -15,11 +16,14 @@ use App\Service\UserService;
  * Class AuthController
  * @package App\Http\Controller
  */
-class AuthController
+class AuthController extends BaseController
 {
+    /**
+     * @return mixed
+     */
     public function registrationForm()
     {
-        require_once BASE_PATH . '/views/auth/register.html';
+        return $this->withoutLayout()->renderView(BASE_PATH . '/views/auth/register.html');
     }
 
     /**
@@ -40,9 +44,12 @@ class AuthController
         }
     }
 
+    /**
+     * @return mixed
+     */
     public function loginForm()
     {
-        require_once BASE_PATH . '/views/auth/login.html';
+        return $this->withoutLayout()->renderView(BASE_PATH . '/views/auth/login.html');
     }
 
     /**
