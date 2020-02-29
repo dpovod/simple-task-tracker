@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Model;
 
+use App\Exception\Model\AttributeNotExistsException;
 use App\Model\Base\BaseModel;
 
 /**
@@ -41,4 +42,21 @@ class Issue extends BaseModel
 
     /** @var string */
     protected const TABLE = 'issues';
+
+    /**
+     * @param int $symbolsLimit
+     * @return string
+     * @throws AttributeNotExistsException
+     */
+    public function getShortDescription(int $symbolsLimit): string
+    {
+        $description = $this->get('description');
+        $descriptionShort = substr($description, 0, $symbolsLimit);
+
+        if (mb_strlen($description) > $symbolsLimit) {
+            return $descriptionShort . '...';
+        }
+
+        return $descriptionShort;
+    }
 }

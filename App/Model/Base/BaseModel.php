@@ -129,6 +129,15 @@ class BaseModel
 
     /**
      * @param string $attribute
+     * @return bool
+     */
+    public function has(string $attribute): bool
+    {
+        return array_key_exists($attribute, $this->attributes);
+    }
+
+    /**
+     * @param string $attribute
      * @param $value
      * @throws FieldTypeNotAllowedException
      */

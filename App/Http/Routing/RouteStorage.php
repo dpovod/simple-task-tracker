@@ -5,6 +5,7 @@ namespace App\Http\Routing;
 
 use App\Http\Controller\AuthController;
 use App\Http\Controller\HomeController;
+use App\Http\Controller\IssueController;
 
 /**
  * Class RouteStorage
@@ -23,6 +24,10 @@ class RouteStorage
             new Route('registration', 'POST', '/auth/register', AuthController::class, 'registration'),
             new Route('login-form', 'GET', '/auth/login', AuthController::class, 'loginForm'),
             new Route('login', 'POST', '/auth/login', AuthController::class, 'login'),
+            new Route('my-issues', 'GET', '/issues/my', IssueController::class, 'myIssues'),
+            new Route('assigned-to-me', 'GET', '/issues/assigned-to-me', IssueController::class, 'assignedToMe'),
+            new Route('create-issue-form', 'GET', '/issues/create', IssueController::class, 'createIssueForm'),
+            new Route('create-issue', 'POST', '/issues/create', IssueController::class, 'createIssue'),
         ];
     }
 

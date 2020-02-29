@@ -14,7 +14,6 @@ use App\Support\Validation\Rules\Required;
 use App\Support\Validation\Rules\StringLength;
 use App\Support\Validation\Validator;
 use ReflectionException;
-use RuntimeException;
 
 /**
  * Class UserService
@@ -22,6 +21,9 @@ use RuntimeException;
  */
 class UserService
 {
+    /** @var User */
+    private static $authUser;
+
     /**
      * @param User $user
      * @return bool
@@ -103,5 +105,36 @@ class UserService
     {
         session_start();
         unset($_SESSION['auth_id']);
+        session_write_close();
+    }
+
+    /**
+     * @return int|null
+     */
+    public static function authUserId(): ?int
+    {
+        session_start();
+
+        return isset($_SESSION['auth_id']) ? (int)$_SESSION['auth_id'] : null;
+    }
+
+    /**
+     * @return User|null
+     * @throws AttributeNotExistsException
+     * @throws ReflectionException
+     */
+    public static function authUser(): User
+    {
+        if (isset(self::$authUser)) {
+            return self::$authUser;
+        }
+
+        if ($id = self::authUserId()) {
+            self::$authUser = (new UserRepository())->findFirstWhere(['id' => $id]);
+
+            return self::$authUser;
+        }
+
+        return null;
     }
 }

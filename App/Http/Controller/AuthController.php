@@ -19,7 +19,7 @@ class AuthController
 {
     public function registrationForm()
     {
-        require_once BASE_PATH . '/html/auth/register.html';
+        require_once BASE_PATH . '/views/auth/register.html';
     }
 
     /**
@@ -42,7 +42,7 @@ class AuthController
 
     public function loginForm()
     {
-        require_once BASE_PATH . '/html/auth/login.html';
+        require_once BASE_PATH . '/views/auth/login.html';
     }
 
     /**

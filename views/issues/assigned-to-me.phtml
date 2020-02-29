@@ -1,0 +1,40 @@
+<div class="container mt-5">
+	<h3 class="pt-4">Assigned to me</h3>
+    <?php if (!empty($issues) && count($issues) > 0) : ?>
+		<table class="table">
+			<thead>
+			<tr>
+				<th>Title</th>
+				<th>Description</th>
+				<th>Author</th>
+			</tr>
+			</thead>
+			<tbody>
+            <?php foreach ($issues as $issue) : ?>
+				<tr>
+					<td><a href="#"><?= $issue->get('title') ?></a></td>
+					<td><?= $issue->getShortDescription(40) ?></td>
+					<td>
+					<?php if (isset($users[$issue->get('author_id')])) : ?>
+						<a href="#"><?= $users[$issue->get('author_id')]->getFullName() ?></a>
+					<?php else : ?>
+						<span>(deleted)</span>
+					<?php endif; ?>
+					</td>
+				</tr>
+            <?php endforeach; ?>
+			</tbody>
+		</table>
+		<div class="container">
+            <?php if (!empty($links)) : ?>
+			<ul class="pagination">
+                <?php foreach ($links as $page => $link) : ?>
+					<li class="<?php echo $link['class'] ?>"><a href="<?php echo $link['url'] ?>"><?php echo $page ?></a></li>
+                <?php endforeach; ?>
+				<ul>
+                    <?php endif; ?>
+		</div>
+    <?php else : ?>
+		<div class="alert alert-warning">No issues to accomplish. <a href="my">Go to your issues</a></div>
+    <?php endif; ?>
+</div>

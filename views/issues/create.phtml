@@ -1,0 +1,22 @@
+<div class="container mt-5">
+	<h3 class="pt-4">New Issue</h3>
+	<form action="" method="post">
+		<div class="form-group">
+			<label for="title">Title</label>
+			<input type="text" class="form-control" id="title" name="title" placeholder="Enter issue title...">
+		</div>
+		<div class="form-group">
+			<label for="description">Description</label>
+			<textarea class="form-control" id="description" name="description" placeholder="Enter issue description..."></textarea>
+		</div>
+		<div class="form-group">
+			<label class="form-check-label" for="assignedTo">Assigned to</label>
+			<select class="form-control" id="assignedTo" name="assigned_to_id">
+				<?php foreach ($users as $user) : ?>
+					<option value="<?= $user->get('id') ;?>"><?= "{$user->getFullName()} ({$user->get('email')})" ?></option>
+				<?php endforeach; ?>
+			</select>
+		</div>
+		<button type="submit" class="btn btn-primary">Create</button>
+	</form>
+</div>

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Repository\Base;
 
+use App\Exception\Model\AttributeNotExistsException;
 use App\Model\Base\BaseModel;
 use PDO;
 use PDOException;
@@ -80,16 +81,39 @@ class BaseRepository
      * @param array $rows
      * @return BaseModel[]
      * @throws ReflectionException
+     * @throws AttributeNotExistsException
      */
     private function createModelInstances(array $rows)
     {
         $result = [];
 
         foreach ($rows as $row) {
-            $result[] = $this->createModelInstance($row);
+            $model = $this->createModelInstance($row);
+
+            if ($model->has('id')) {
+                $result[$model->get('id')] = $model;
+            } else {
+                $result[] = $model;
+            }
+
         }
 
         return $result;
+    }
+
+    /**
+     * @return array
+     * @throws ReflectionException
+     * @throws AttributeNotExistsException
+     */
+    public function getList()
+    {
+        $query = "SELECT * FROM `{$this->table}`";
+        $statement = $this->connection->prepare($query);
+        $statement->execute();
+        $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+        return !$rows ? [] : $this->createModelInstances($rows);
     }
 
     /**
@@ -97,8 +121,9 @@ class BaseRepository
      * @param int $offset
      * @return array
      * @throws ReflectionException
+     * @throws AttributeNotExistsException
      */
-    public function getList(int $limit, int $offset)
+    public function getListPaginated(int $limit, int $offset)
     {
         $query = "SELECT * FROM `{$this->table}` LIMIT :limit OFFSET :offset";
         $statement = $this->connection->prepare($query);
@@ -131,6 +156,7 @@ class BaseRepository
      * @param string $condition
      * @return BaseModel[]|array
      * @throws ReflectionException
+     * @throws AttributeNotExistsException
      */
     public function findWhere(array $wheres, string $condition = self::CONDITION_AND)
     {
@@ -152,11 +178,12 @@ class BaseRepository
      * @param string $condition
      * @return BaseModel|null
      * @throws ReflectionException
+     * @throws AttributeNotExistsException
      */
     public function findFirstWhere(array $wheres, string $condition = self::CONDITION_AND): ?BaseModel
     {
         $models = $this->findWhere($wheres, $condition);
 
-        return $models ? $models[0] : null;
+        return $models ? array_shift($models) : null;
     }
 }

@@ -1,0 +1,79 @@
+<?php
+use App\Service\UserService;
+
+$authUser = UserService::authUser();
+
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Tracker.Local</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.8/css/all.css">
+</head>
+<body>
+<?php $baseUri = getenv('SITE_URI'); ?>
+<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+	<a class="navbar-brand" href="#">Fixed navbar</a>
+	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"
+			aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+		<span class="navbar-toggler-icon"></span>
+	</button>
+	<div class="collapse navbar-collapse" id="navbarCollapse">
+		<ul class="navbar-nav mr-auto">
+			<li class="nav-item active">
+				<a class="nav-link" href="<?= "$baseUri" ?>">Home <span class="sr-only">(current)</span></a>
+			</li>
+			<li class="nav-item">
+				<a class="nav-link" href="<?= "$baseUri/issues/my" ?>">My Issues</a>
+			</li>
+			<li class="nav-item">
+				<a class="nav-link" href="<?= "$baseUri/issues/assigned-to-me" ?>">Assigned to me</a>
+			</li>
+		</ul>
+	</div>
+
+	<?php if ($authUser !== null) :?>
+	<div class="dropdown">
+		<button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+			<?= $authUser->get('email') ?>
+		</button>
+		<div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+			<a class="dropdown-item" href="#">Profile</a>
+			<a class="dropdown-item btn btn-light" href="<?= "$baseUri/issues/create" ?>">Create Issue</a>
+			<div class="dropdown-divider"></div>
+			<a class="dropdown-item js-logout-btn" href="javascript:">Logout</a>
+		</div>
+	</div>
+	<?php else : ?>
+	<a href="<?= "$baseUri/auth/login" ?>">Sign In</a>
+	<?php endif; ?>
+</nav>
+
+<main role="main" class="container">
+	<div class="row">
+        <?php if (!empty($errors)) : ?>
+            <?php foreach ($errors as $error) : ?>
+				<div class="alert alert-danger" role="alert"><?php echo $error ?></div>
+            <?php endforeach; ?>
+        <?php endif; ?>
+
+        <?php if (!empty($success)) : ?>
+			<div class="alert alert-success" role="alert"><?php echo $success ?></div>
+        <?php endif; ?>
+	</div>
+    <?php include $contentView ?>
+</main>
+<script>
+    setTimeout(function () {
+        $(".alert-success").fadeTo(1000, 500).slideUp(500, function () {
+            $(".alert-success").alert('close');
+        });
+    }, 2000);
+</script>
+</body>
+</html>

@@ -3,14 +3,29 @@ declare(strict_types=1);
 
 namespace App\Http\Controller;
 
+use App\Exception\Http\NotFoundException;
+use App\Http\Request\Request;
+use App\Http\Routing\Redirector;
+use App\Service\UserService;
+
 /**
  * Class HomeController
  * @package App\Http\Controller
  */
 class HomeController
 {
-    public function index()
+    /**
+     * @param Request $request
+     * @throws NotFoundException
+     */
+    public function index(Request $request)
     {
-        echo 'Welcome to Simple Task Tracker';
+        $redirector = new Redirector($request);
+
+        if (UserService::authUserId()) {
+            $redirector->redirectTo('my-issues');
+        } else {
+            $redirector->redirectTo('login-form');
+        }
     }
 }
