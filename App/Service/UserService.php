@@ -114,8 +114,10 @@ class UserService
     public static function authUserId(): ?int
     {
         session_start();
+        $id = isset($_SESSION['auth_id']) ? (int)$_SESSION['auth_id'] : null;
+        session_write_close();
 
-        return isset($_SESSION['auth_id']) ? (int)$_SESSION['auth_id'] : null;
+        return $id;
     }
 
     /**

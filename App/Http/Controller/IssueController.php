@@ -64,6 +64,7 @@ class IssueController extends BaseController
      * @throws FieldTypeNotAllowedException
      * @throws \ReflectionException
      * @throws NotFoundException
+     * @throws AttributeNotExistsException
      */
     public function createIssue(Request $request)
     {
@@ -86,12 +87,13 @@ class IssueController extends BaseController
      * @return mixed
      * @throws AttributeNotExistsException
      * @throws \ReflectionException
+     * @throws NotFoundException
      */
     public function editIssueForm(Request $request)
     {
         $id = $request->getCurrentRoute()->getParam('id');
         $users = (new UserRepository())->getList();
-        $issue = (new IssueRepository())->findFirstWhere(['id' => $id]);
+        $issue = (new IssueRepository())->findFirstWhereOrFail(['id' => $id]);
 
         return $this->renderView(BASE_PATH . '/views/issues/create_edit.phtml', compact('users', 'issue'));
     }
@@ -107,7 +109,7 @@ class IssueController extends BaseController
     {
         $id = $request->getCurrentRoute()->getParam('id');
         /** @var Issue $issue */
-        $issue = (new IssueRepository())->findFirstWhere(['id' => $id]);
+        $issue = (new IssueRepository())->findFirstWhereOrFail(['id' => $id]);
 
         foreach ($request->getPostParams() as $field => $param) {
             $issue->set($field, $param);
@@ -118,7 +120,7 @@ class IssueController extends BaseController
 
         try {
             if ($issueService->createOrUpdate($issue)) {
-                $redirector->redirectTo('my-issues');
+                $redirector->redirectTo('show-issue', ['id' => $id]);
             }
         } catch (ValidationException $e) {
             //@todo: show error
@@ -132,11 +134,12 @@ class IssueController extends BaseController
      * @return mixed
      * @throws AttributeNotExistsException
      * @throws \ReflectionException
+     * @throws NotFoundException
      */
     public function showIssue(Request $request)
     {
         $id = (int)$request->getCurrentRoute()->getParam('id');
-        $issue = (new IssueRepository())->findFirstWhere(['id' => $id]);
+        $issue = (new IssueRepository())->findFirstWhereOrFail(['id' => $id]);
         $users = (new UserRepository())->getList();
         $author = $users[$issue->get('author_id')];
         $assignedTo = $users[$issue->get('assigned_to_id')];

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Repository\Base;
 
+use App\Exception\Http\NotFoundException;
 use App\Exception\Model\AttributeNotExistsException;
 use App\Model\Base\BaseModel;
 use PDO;
@@ -215,5 +216,24 @@ class BaseRepository
         $models = $this->findWhere($wheres, $condition);
 
         return $models ? array_shift($models) : null;
+    }
+
+    /**
+     * @param array $wheres
+     * @param string $condition
+     * @return BaseModel|null
+     * @throws ReflectionException
+     * @throws AttributeNotExistsException
+     * @throws NotFoundException
+     */
+    public function findFirstWhereOrFail(array $wheres, string $condition = self::CONDITION_AND): ?BaseModel
+    {
+        $models = $this->findWhere($wheres, $condition);
+
+        if (!$models) {
+            throw new NotFoundException('Models not found.');
+        }
+
+        return array_shift($models);
     }
 }

@@ -22,9 +22,11 @@ class Redirector
 
     /**
      * @param string $routeName
+     * @param array $withParams
      * @throws NotFoundException
+     * @throws \Exception
      */
-    public function redirectTo(string $routeName)
+    public function redirectTo(string $routeName, array $withParams = [])
     {
         $route = $this->routeStorage->getRoute($routeName);
 
@@ -32,7 +34,7 @@ class Redirector
             throw new NotFoundException("Route '$routeName' not found.");
         }
 
-        $uri = getenv('SITE_URI') . $route->getUri();
+        $uri = getenv('SITE_URI') . $route->getUri($withParams);
         header("Location: $uri");
         exit;
     }

@@ -19,7 +19,7 @@ class HttpErrorsResolver
             $code = $e->getCode();
             http_response_code($code);
             $path = BASE_PATH;
-            require_once "$path/html/error-pages/{$code}.html";
+            require_once "$path/views/error-pages/{$code}.html";
             exit();
         }
 

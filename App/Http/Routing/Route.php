@@ -76,11 +76,30 @@ class Route
     }
 
     /**
+     * @param array $withParams
      * @return string
+     * @throws \Exception
+     * @todo: throw more specific exceptions here
      */
-    public function getUri(): string
+    public function getUri(array $withParams = []): string
     {
-        return $this->uri;
+        if (!$withParams && $this->hasUriParams()) {
+            throw new \Exception('URI params should be specified.');
+        }
+
+        if ($withParams && !$this->hasUriParams()) {
+            throw new \Exception('There should not be parameters in the URI, but they were specified.');
+        }
+
+        if (!$withParams) {
+            return $this->uri;
+        }
+
+        $search = array_map(function ($paramName) {
+            return '{' . $paramName . '}';
+        }, array_keys($withParams));
+
+        return str_replace($search, array_values($withParams), $this->uri);
     }
 
     public function getUriRegex()
@@ -139,6 +158,7 @@ class Route
     /**
      * @param string $uri
      * @return bool
+     * @throws \Exception
      */
     public function checkUriMatch(string $uri)
     {

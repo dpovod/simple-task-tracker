@@ -41,7 +41,8 @@ class RouteResolver
                 $request->setCurrentRoute($route);
                 $className = $route->getController();
                 $controllerInstance = new $className;
-                $controllerInstance->{$route->getAction()}($request);
+
+                return $controllerInstance->{$route->getAction()}($request);
             }
         }
 
