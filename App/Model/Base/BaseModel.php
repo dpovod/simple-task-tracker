@@ -45,6 +45,9 @@ class BaseModel
     /** @var array */
     protected $attributes = [];
 
+    /** @var array */
+    protected $touchedAttributes = [];
+
     /**
      * BaseModel constructor.
      * @param array $fields
@@ -143,6 +146,23 @@ class BaseModel
      */
     public function set(string $attribute, $value)
     {
+        $this->touchedAttributes[$attribute] = $value;
         $this->attributes[$attribute] = $this->castAttribute($attribute, $value);
+    }
+
+    /**
+     * @return array
+     */
+    public function getTouchedAttributes(): array
+    {
+        return $this->touchedAttributes;
+    }
+
+    /**
+     * @return array
+     */
+    public function getTouchedKeys(): array
+    {
+        return array_keys($this->touchedAttributes);
     }
 }

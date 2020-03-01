@@ -28,6 +28,17 @@ class Issue extends BaseModel
 
     public const STATUS_REJECTED = 7;
 
+    public const STATUES_NAMES = [
+        self::STATUS_NEW => 'New',
+        self::STATUS_CLARIFICATION_REQUIRED => 'Clarification required',
+        self::STATUS_IN_PROGRESS => 'In progress',
+        self::STATUS_REVIEW_REQUIRED => 'Review required',
+        self::STATUS_REVIEW_IN_PROGRESS => 'Review in progress',
+        self::STATUS_REWORK_REQUIRED => 'Rework required',
+        self::STATUS_DONE => 'Done',
+        self::STATUS_REJECTED => 'Rejected',
+    ];
+
     /** @var array */
     protected $schema = [
         'id' => self::FIELD_TYPE_INT,
@@ -58,5 +69,32 @@ class Issue extends BaseModel
         }
 
         return $descriptionShort;
+    }
+
+    /**
+     * @return string
+     * @throws AttributeNotExistsException
+     */
+    public function getLink(): string
+    {
+        return getenv('SITE_URI') . '/issues/show/' . $this->get('id');
+    }
+
+    /**
+     * @return string
+     * @throws AttributeNotExistsException
+     */
+    public function getEditLink(): string
+    {
+        return getenv('SITE_URI') . '/issues/edit/' . $this->get('id');
+    }
+
+    /**
+     * @return string
+     * @throws AttributeNotExistsException
+     */
+    public function getStatusName(): string
+    {
+        return self::STATUES_NAMES[$this->get('status')];
     }
 }

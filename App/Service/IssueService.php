@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Service;
 
+use App\Exception\Model\AttributeNotExistsException;
 use App\Exception\Model\FieldTypeNotAllowedException;
 use App\Exception\Validation\ValidationException;
 use App\Model\Issue;
@@ -25,8 +26,9 @@ class IssueService
      * @throws FieldTypeNotAllowedException
      * @throws ReflectionException
      * @throws ValidationException
+     * @throws AttributeNotExistsException
      */
-    public function create(Issue $issue)
+    public function createOrUpdate(Issue $issue)
     {
         $validator = new Validator($issue->getAttributes());
 
@@ -45,7 +47,8 @@ class IssueService
         }
 
         $issue->set('author_id', UserService::authUserId());
+        $issueRepository = new IssueRepository();
 
-        return (new IssueRepository())->insert($issue);
+        return $issue->has('id') ? $issueRepository->save($issue) : $issueRepository->insert($issue);
     }
 }

@@ -152,6 +152,36 @@ class BaseRepository
     }
 
     /**
+     * @param BaseModel $model
+     * @return bool
+     * @throws AttributeNotExistsException
+     */
+    public function save(BaseModel $model)
+    {
+        $id = $model->get('id');
+
+        $touched = $model->getTouchedAttributes();
+
+        if (!$touched) {
+            return false;
+        }
+
+        $updates = [];
+
+        foreach ($model->getTouchedKeys() as $columnName) {
+            $updates[] = "`$columnName` = ?";
+        }
+
+        $query = "UPDATE `{$this->table}` SET " . implode(', ', $updates) . ' WHERE `id` = ?';
+
+        $statement = $this->connection->prepare($query);
+        $params = array_values($touched);
+        $params[] = $id;
+
+        return $statement->execute($params);
+    }
+
+    /**
      * @param array $wheres
      * @param string $condition
      * @return BaseModel[]|array

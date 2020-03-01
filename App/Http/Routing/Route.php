@@ -9,6 +9,8 @@ namespace App\Http\Routing;
  */
 class Route
 {
+    private const VAR_PATTERN = '[0-9a-zA-Z-_]+';
+
     /** @var string */
     private $name;
 
@@ -23,6 +25,9 @@ class Route
 
     /** @var string */
     private $action;
+
+    /** @var array */
+    private $params;
 
     /**
      * Route constructor.
@@ -78,6 +83,18 @@ class Route
         return $this->uri;
     }
 
+    public function getUriRegex()
+    {
+        if (!$this->hasUriParams()) {
+            return "/$this->uri/";
+        }
+
+        $varPattern = self::VAR_PATTERN;
+        $regex = str_replace('/', '\/', preg_replace("/\{$varPattern}/", $varPattern, $this->uri));
+
+        return "/$regex/";
+    }
+
     /**
      * @return string
      */
@@ -92,5 +109,90 @@ class Route
     public function getAction(): string
     {
         return $this->action;
+    }
+
+    /**
+     * @return bool
+     */
+    private function hasUriParams(): bool
+    {
+        $varPattern = self::VAR_PATTERN;
+
+        return (bool)preg_match("/\{$varPattern}/", $this->uri);
+    }
+
+    /**
+     * @return array
+     */
+    public function getUriParams(): array
+    {
+        if (!$this->hasUriParams()) {
+            return [];
+        }
+
+        $varPattern = self::VAR_PATTERN;
+        preg_match_all("/\{($varPattern)}/U", $this->uri, $matches);
+
+        return isset($matches[1]) ? $matches[1] : [];
+    }
+
+    /**
+     * @param string $uri
+     * @return bool
+     */
+    public function checkUriMatch(string $uri)
+    {
+        if (!$this->hasUriParams()) {
+            return $this->getUri() === $this->prepareUri($uri);
+        }
+
+        $regex = $this->getUriRegex();
+
+        return (bool)preg_match($regex, $uri);
+    }
+
+    /**
+     * @param string $uri
+     * @return bool
+     * @throws \Exception
+     */
+    public function mapParams(string $uri)
+    {
+        if (!$this->checkUriMatch($uri)) {
+            //todo: throw more specific exception
+            throw new \Exception("Uri doesn't match.");
+        }
+
+        if (!$this->hasUriParams()) {
+            return true;
+        }
+
+        $varPattern = self::VAR_PATTERN;
+        $regex = str_replace('/', '\/', preg_replace("/\{$varPattern}/", "($varPattern)", $this->uri));
+
+        preg_match_all("/$regex/", $uri, $matches);
+
+        if (empty($matches)) {
+            return false;
+        }
+
+        unset($matches[0]);
+        $matches = array_values($matches);
+        $paramsNames = $this->getUriParams();
+
+        foreach ($matches as $key => $match) {
+            $this->params[$paramsNames[$key]] = $match[0];
+        }
+
+        return true;
+    }
+
+    /**
+     * @param string $paramName
+     * @return mixed|null
+     */
+    public function getParam(string $paramName)
+    {
+        return $this->params[$paramName] ?? null;
     }
 }

@@ -28,6 +28,9 @@ class RouteStorage
             new Route('assigned-to-me', 'GET', '/issues/assigned-to-me', IssueController::class, 'assignedToMe'),
             new Route('create-issue-form', 'GET', '/issues/create', IssueController::class, 'createIssueForm'),
             new Route('create-issue', 'POST', '/issues/create', IssueController::class, 'createIssue'),
+            new Route('edit-issue-form', 'GET', '/issues/edit/{id}', IssueController::class, 'editIssueForm'),
+            new Route('edit-issue', 'POST', '/issues/edit/{id}', IssueController::class, 'editIssue'),
+            new Route('show-issue', 'GET', '/issues/show/{id}', IssueController::class, 'showIssue'),
         ];
     }
 

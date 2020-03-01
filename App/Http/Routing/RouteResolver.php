@@ -28,15 +28,17 @@ class RouteResolver
      * @param Request $request
      * @return mixed
      * @throws NotFoundException
+     * @throws \Exception
      */
     public function resolve(Request $request)
     {
         foreach ($this->routeStorage->getRoutes() as $route) {
-            if ($request->getUri() === $route->getUri() && $request->getMethod() === $route->getMethod()) {
+            if ($route->checkUriMatch($request->getUri()) && $route->getMethod() === $request->getMethod()) {
                 if (!method_exists($route->getController(), $route->getAction())) {
                     throw new NotFoundException();
                 }
 
+                $request->setCurrentRoute($route);
                 $className = $route->getController();
                 $controllerInstance = new $className;
                 $controllerInstance->{$route->getAction()}($request);

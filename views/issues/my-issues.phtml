@@ -1,3 +1,13 @@
+<?php
+
+use App\Model\Issue;
+use App\Model\User;
+
+/** @var Issue[] $issues */
+/** @var User[] $users */
+/** @var User $author */
+/** @var User $assignedTo */
+?>
 <div class="container mt-5">
 	<h3 class="pt-4">My Issues</h3>
     <?php if (!empty($issues) && count($issues) > 0) : ?>
@@ -16,7 +26,7 @@
 			<tbody>
             <?php foreach ($issues as $issue) : ?>
 				<tr>
-					<td><a href="#"><?= $issue->get('title') ?></a></td>
+					<td><a href="<?= $issue->getLink() ?>"><?= $issue->get('title') ?></a></td>
 					<td><?= $issue->getShortDescription(40) ?></td>
 					<td>
 					<?php if (isset($users[$issue->get('assigned_to_id')])) : ?>

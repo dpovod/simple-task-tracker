@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Http\Request;
 
 use App\Exception\Http\MethodNotAllowedException;
+use App\Http\Routing\Route;
 use App\Http\Routing\RouteStorage;
 
 /**
@@ -35,6 +36,9 @@ class Request
 
     /** @var RouteStorage */
     private $routeStorage;
+
+    /** @var Route */
+    private $currentRoute;
 
     /**
      * Request constructor.
@@ -124,5 +128,23 @@ class Request
     public function setRouteStorage(RouteStorage $routeStorage): void
     {
         $this->routeStorage = $routeStorage;
+    }
+
+    /**
+     * @return Route
+     */
+    public function getCurrentRoute(): Route
+    {
+        return $this->currentRoute;
+    }
+
+    /**
+     * @param Route $currentRoute
+     * @throws \Exception
+     */
+    public function setCurrentRoute(Route $currentRoute): void
+    {
+        $currentRoute->mapParams($this->getUri());
+        $this->currentRoute = $currentRoute;
     }
 }
