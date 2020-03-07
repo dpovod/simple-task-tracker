@@ -49,6 +49,36 @@ class IssueController extends BaseController
     }
 
     /**
+     * @param Request $request
+     * @return mixed
+     * @throws AttributeNotExistsException
+     * @throws \ReflectionException
+     */
+    public function assignedToUser(Request $request)
+    {
+        $users = (new UserRepository())->getList();
+        //@todo: pagination
+        $issues = (new IssueRepository())->findWhere(['assigned_to_id' => $request->getCurrentRoute()->getParam('id')]);
+
+        return $this->renderView(BASE_PATH . '/views/issues/my-issues.phtml', compact('users', 'issues'));
+    }
+
+    /**
+     * @param Request $request
+     * @return mixed
+     * @throws AttributeNotExistsException
+     * @throws \ReflectionException
+     */
+    public function createdByUser(Request $request)
+    {
+        $users = (new UserRepository())->getList();
+        //@todo: pagination
+        $issues = (new IssueRepository())->findWhere(['author_id' => $request->getCurrentRoute()->getParam('id')]);
+
+        return $this->renderView(BASE_PATH . '/views/issues/assigned-to-me.phtml', compact('users', 'issues'));
+    }
+
+    /**
      * @throws \ReflectionException
      * @throws AttributeNotExistsException
      */

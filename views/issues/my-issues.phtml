@@ -30,7 +30,8 @@ use App\Model\User;
 					<td><?= $issue->getShortDescription(40) ?></td>
 					<td>
 					<?php if (isset($users[$issue->get('assigned_to_id')])) : ?>
-						<a href="#"><?= $users[$issue->get('assigned_to_id')]->getFullName() ?></a>
+					<?php $assignedTo = $users[$issue->get('assigned_to_id')]; /** @var User $assignedTo */?>
+						<a href="<?= $assignedTo->getLink()?>"><?= $assignedTo->getFullName() ?></a>
 					<?php else : ?>
 						<span>(deleted)</span>
 					<?php endif; ?>

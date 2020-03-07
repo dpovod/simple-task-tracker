@@ -44,4 +44,31 @@ class User extends BaseModel
     {
         return $this->get('name') . ' ' . $this->get('last_name');
     }
+
+    /**
+     * @return string
+     * @throws AttributeNotExistsException
+     */
+    public function getLink(): string
+    {
+        return getenv('SITE_URI') . '/users/' . $this->get('id');
+    }
+
+    /**
+     * @return string
+     * @throws AttributeNotExistsException
+     */
+    public function getAssignedIssuesLink(): string
+    {
+        return getenv('SITE_URI') . '/issues/assigned-to/' . $this->get('id');
+    }
+
+    /**
+     * @return string
+     * @throws AttributeNotExistsException
+     */
+    public function getCreatedIssuesLink(): string
+    {
+        return getenv('SITE_URI') . '/issues/created-by/' . $this->get('id');
+    }
 }

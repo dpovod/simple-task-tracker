@@ -1,50 +1,39 @@
 <?php
 
-use App\Model\Issue;
 use App\Model\User;
 
-/** @var Issue $issue */
+/** @var User $user */
 /** @var User[] $users */
 /** @var User $author */
 /** @var User $assignedTo */
 ?>
 <div class="container mt-5" style="page-break-before: always;">
 	<div>
-		<h4 class="pt-4"><?= $issue->get('title') ?></h4>
-		<a class="btn btn-light float-right" href="<?= $issue->getEditLink() ?>">Edit issue</a>
+		<h4 class="pt-4"><?= $user->getFullName() ?></h4>
 	</div>
 	<table class="table table-sm table-borderless table-responsive">
 		<tbody>
 		<tr>
 			<td>
-				<strong>Author</strong>
+				<strong>Email</strong>
 			</td>
-			<td>
-				<span><a href="<?= $author->getLink() ?>"><?= $author->getFullName() ?></a></span>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<strong>Assigned to</strong>
-			</td>
-			<td>
-				<span><a href="<?= $assignedTo->getLink() ?>"><?= $assignedTo->getFullName() ?></a></span>
+			<td><?= $user->get('email') ?>
 			</td>
 		</tr>
 		<tr>
 			<td>
-				<strong>Status</strong>
+				<strong>Created issues</strong>
 			</td>
 			<td>
-				<span><?= $issue->getStatusName() ?></span>
+				<span><a href="<?= $user->getCreatedIssuesLink()?>">(count) issues</a></span>
 			</td>
 		</tr>
 		<tr>
 			<td>
-				<strong>Description</strong>
+				<strong>Assigned issues</strong>
 			</td>
 			<td>
-				<p><?= $issue->get('description') ?></p>
+				<span><a href="<?= $user->getAssignedIssuesLink()?>">(count) issues</a></span>
 			</td>
 		</tr>
 		</tbody>

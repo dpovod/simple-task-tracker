@@ -1,0 +1,42 @@
+<?php
+
+use App\Model\User;
+
+/** @var User[] $users */
+?>
+<div class="container mt-5">
+	<h3 class="pt-4">Users</h3>
+    <?php if (!empty($users) && count($users) > 0) : ?>
+		<table class="table">
+			<thead>
+			<tr>
+				<th>Full Name</th>
+				<th>Email</th>
+				<th>Assigned issues</th>
+			</tr>
+			</thead>
+			<tbody>
+            <?php foreach ($users as $user) : ?>
+				<tr>
+					<td><a href="<?= $user->getLink() ?>"><?= $user->get('email') ?></a></td>
+					<td><?= $user->get('email') ?></td>
+					<td>
+						<a href="<?= $user->getAssignedIssuesLink() ?>">(Count) issues</a>
+					</td>
+				</tr>
+            <?php endforeach; ?>
+			</tbody>
+		</table>
+		<div class="container">
+            <?php if (!empty($links)) : ?>
+			<ul class="pagination">
+                <?php foreach ($links as $page => $link) : ?>
+					<li class="<?php echo $link['class'] ?>"><a href="<?php echo $link['url'] ?>"><?php echo $page ?></a></li>
+                <?php endforeach; ?>
+				<ul>
+                    <?php endif; ?>
+		</div>
+    <?php else : ?>
+		<div class="alert alert-warning">No issues. <a href="create">Create</a></div>
+    <?php endif; ?>
+</div>
