@@ -32,6 +32,15 @@ class BaseRepository
     }
 
     /**
+     * @param string $className
+     * @return bool
+     */
+    public function isModel(string $className): bool
+    {
+        return $className === $this->getModel();
+    }
+
+    /**
      * @throws ReflectionException
      */
     protected function getTable()
@@ -134,6 +143,17 @@ class BaseRepository
         $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
 
         return !$rows ? [] : $this->createModelInstances($rows);
+    }
+
+    /**
+     * @return int
+     */
+    public function getCount(): int
+    {
+        $query = "SELECT count(*) as cnt FROM `{$this->table}`";
+        $statement = $this->connection->prepare($query);
+        $statement->execute();
+        return (int)$statement->fetchColumn();
     }
 
     /**
