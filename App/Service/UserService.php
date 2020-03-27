@@ -46,7 +46,7 @@ class UserService
             /** @var Validator $validator */
             /** @var User $user */
             /** @var User[] $existingUsers */
-            $existingUsers = (new UserRepository())->findWhere(
+            $existingUsers = (new UserRepository())->findMany(
                 ['login' => $user->get('login'), 'email' => $user->get('email')],
                 BaseRepository::CONDITION_OR
             );
@@ -84,7 +84,7 @@ class UserService
     public function login(string $login, string $password)
     {
         $repository = new UserRepository();
-        $user = $repository->findFirstWhere(['login' => $login]);
+        $user = $repository->findFirst(['login' => $login]);
 
         /** @var User $user */
         if ($user === null) {
@@ -132,7 +132,7 @@ class UserService
         }
 
         if ($id = self::authUserId()) {
-            self::$authUser = (new UserRepository())->findFirstWhere(['id' => $id]);
+            self::$authUser = (new UserRepository())->findFirst(['id' => $id]);
 
             return self::$authUser;
         }

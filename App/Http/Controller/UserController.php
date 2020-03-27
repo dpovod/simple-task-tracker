@@ -36,7 +36,7 @@ class UserController extends BaseController
     public function showUser(Request $request)
     {
         $id = $request->getCurrentRoute()->getParam('id');
-        $user = (new UserRepository())->findFirstWhereOrFail(['id' => $id]);
+        $user = (new UserRepository())->findFirstOrFail(['id' => $id]);
 
         return $this->renderView(BASE_PATH . '/views/users/show.phtml', compact('user'));
     }

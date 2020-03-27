@@ -30,7 +30,7 @@ class IssueController extends BaseController
     {
         $users = (new UserRepository())->getList();
         //@todo: pagination
-        $issues = (new IssueRepository())->findWhere(['author_id' => UserService::authUserId()]);
+        $issues = (new IssueRepository())->findMany(['author_id' => UserService::authUserId()]);
 
         return $this->renderView(BASE_PATH . '/views/issues/my-issues.phtml', compact('users', 'issues'));
     }
@@ -43,7 +43,7 @@ class IssueController extends BaseController
     {
         $users = (new UserRepository())->getList();
         //@todo: pagination
-        $issues = (new IssueRepository())->findWhere(['assigned_to_id' => UserService::authUserId()]);
+        $issues = (new IssueRepository())->findMany(['assigned_to_id' => UserService::authUserId()]);
 
         return $this->renderView(BASE_PATH . '/views/issues/assigned-to-me.phtml', compact('users', 'issues'));
     }
@@ -58,7 +58,7 @@ class IssueController extends BaseController
     {
         $users = (new UserRepository())->getList();
         //@todo: pagination
-        $issues = (new IssueRepository())->findWhere(['assigned_to_id' => $request->getCurrentRoute()->getParam('id')]);
+        $issues = (new IssueRepository())->findMany(['assigned_to_id' => $request->getCurrentRoute()->getParam('id')]);
 
         return $this->renderView(BASE_PATH . '/views/issues/my-issues.phtml', compact('users', 'issues'));
     }
@@ -73,7 +73,7 @@ class IssueController extends BaseController
     {
         $users = (new UserRepository())->getList();
         //@todo: pagination
-        $issues = (new IssueRepository())->findWhere(['author_id' => $request->getCurrentRoute()->getParam('id')]);
+        $issues = (new IssueRepository())->findMany(['author_id' => $request->getCurrentRoute()->getParam('id')]);
 
         return $this->renderView(BASE_PATH . '/views/issues/assigned-to-me.phtml', compact('users', 'issues'));
     }
@@ -123,7 +123,7 @@ class IssueController extends BaseController
     {
         $id = $request->getCurrentRoute()->getParam('id');
         $users = (new UserRepository())->getList();
-        $issue = (new IssueRepository())->findFirstWhereOrFail(['id' => $id]);
+        $issue = (new IssueRepository())->findFirstOrFail(['id' => $id]);
 
         return $this->renderView(BASE_PATH . '/views/issues/create_edit.phtml', compact('users', 'issue'));
     }
@@ -139,7 +139,7 @@ class IssueController extends BaseController
     {
         $id = $request->getCurrentRoute()->getParam('id');
         /** @var Issue $issue */
-        $issue = (new IssueRepository())->findFirstWhereOrFail(['id' => $id]);
+        $issue = (new IssueRepository())->findFirstOrFail(['id' => $id]);
 
         foreach ($request->getPostParams() as $field => $param) {
             $issue->set($field, $param);
@@ -169,7 +169,7 @@ class IssueController extends BaseController
     public function showIssue(Request $request)
     {
         $id = (int)$request->getCurrentRoute()->getParam('id');
-        $issue = (new IssueRepository())->findFirstWhereOrFail(['id' => $id]);
+        $issue = (new IssueRepository())->findFirstOrFail(['id' => $id]);
         $users = (new UserRepository())->getList();
         $author = $users[$issue->get('author_id')];
         $assignedTo = $users[$issue->get('assigned_to_id')];

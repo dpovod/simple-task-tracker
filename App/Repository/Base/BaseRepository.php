@@ -189,7 +189,7 @@ class BaseRepository
      * @throws ReflectionException
      * @throws AttributeNotExistsException
      */
-    public function findWhere(array $wheres, string $condition = self::CONDITION_AND)
+    public function findMany(array $wheres, string $condition = self::CONDITION_AND)
     {
         $wheresColumns = array_map(function ($column) {
             return " `$column` = ? ";
@@ -211,9 +211,9 @@ class BaseRepository
      * @throws ReflectionException
      * @throws AttributeNotExistsException
      */
-    public function findFirstWhere(array $wheres, string $condition = self::CONDITION_AND): ?BaseModel
+    public function findFirst(array $wheres, string $condition = self::CONDITION_AND): ?BaseModel
     {
-        $models = $this->findWhere($wheres, $condition);
+        $models = $this->findMany($wheres, $condition);
 
         return $models ? array_shift($models) : null;
     }
@@ -226,9 +226,9 @@ class BaseRepository
      * @throws AttributeNotExistsException
      * @throws NotFoundException
      */
-    public function findFirstWhereOrFail(array $wheres, string $condition = self::CONDITION_AND): ?BaseModel
+    public function findFirstOrFail(array $wheres, string $condition = self::CONDITION_AND): ?BaseModel
     {
-        $models = $this->findWhere($wheres, $condition);
+        $models = $this->findMany($wheres, $condition);
 
         if (!$models) {
             throw new NotFoundException('Models not found.');
