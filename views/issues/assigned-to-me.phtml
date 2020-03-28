@@ -34,13 +34,9 @@ use App\Model\User;
 			</tbody>
 		</table>
 		<div class="container">
-            <?php if (!empty($links)) : ?>
-			<ul class="pagination">
-                <?php foreach ($links as $page => $link) : ?>
-					<li class="<?php echo $link['class'] ?>"><a href="<?php echo $link['url'] ?>"><?php echo $page ?></a></li>
-                <?php endforeach; ?>
-				<ul>
-                    <?php endif; ?>
+            <?php if (!empty($pagination_links)) : ?>
+			<?php require_once './../partial/pagination.phtml';?>
+			<?php endif; ?>
 		</div>
     <?php else : ?>
 		<div class="alert alert-warning">No issues to accomplish. <a href="my">Go to your issues</a></div>

@@ -25,10 +25,10 @@ class RouteRegistrar
                 throw new RouteAlreadyRegisteredException("Route with name '{$route->getName()}' already registered.");
             }
 
-            if ($route->getUri() === $registeredRoute->getUri()
+            if ($route->getUrlPath() === $registeredRoute->getUrlPath()
                 && $route->getMethod() === $registeredRoute->getMethod()) {
                 throw new RouteAlreadyRegisteredException(
-                    "Route for URL '{$route->getUri()}' (method {$route->getMethod()}) already registered."
+                    "Route for URL '{$route->getUrlPath()}' (method {$route->getMethod()}) already registered."
                 );
             }
 

@@ -18,7 +18,7 @@ class Route
     private $method;
 
     /** @var string */
-    private $uri;
+    private $url;
 
     /** @var string */
     private $controller;
@@ -41,22 +41,22 @@ class Route
     {
         $this->name = $name;
         $this->method = $method;
-        $this->uri = $this->prepareUri($url);
+        $this->url = $this->prepareUrl($url);
         $this->controller = $controller;
         $this->action = $action;
     }
 
     /**
-     * @param string $uri
+     * @param string $url
      * @return string
      */
-    private function prepareUri(string $uri)
+    private function prepareUrl(string $url)
     {
-        if (strlen($uri) > 1) {
-            $uri = rtrim('/' . $uri, '/');
+        if (strlen($url) > 1) {
+            $url = rtrim('/' . $url, '/');
         }
 
-        return str_replace('//', '/', $uri);
+        return str_replace('//', '/', $url);
     }
 
     /**
@@ -81,35 +81,45 @@ class Route
      * @throws \Exception
      * @todo: throw more specific exceptions here
      */
-    public function getUri(array $withParams = []): string
+    public function getUrlPath(array $withParams = []): string
     {
-        if (!$withParams && $this->hasUriParams()) {
-            throw new \Exception('URI params should be specified.');
+        if (!$withParams && $this->hasUrlParams()) {
+            throw new \Exception('URL params should be specified.');
         }
 
-        if ($withParams && !$this->hasUriParams()) {
-            throw new \Exception('There should not be parameters in the URI, but they were specified.');
+        if ($withParams && !$this->hasUrlParams()) {
+            throw new \Exception('There should not be parameters in the URL, but they were specified.');
         }
 
         if (!$withParams) {
-            return $this->uri;
+            return $this->url;
         }
 
         $search = array_map(function ($paramName) {
             return '{' . $paramName . '}';
         }, array_keys($withParams));
 
-        return str_replace($search, array_values($withParams), $this->uri);
+        return str_replace($search, array_values($withParams), $this->url);
     }
 
-    public function getUriRegex()
+    /**
+     * @param array $withParams
+     * @return string
+     * @throws \Exception
+     */
+    public function getFullUrl(array $withParams = [])
     {
-        if (!$this->hasUriParams()) {
-            return "/$this->uri/";
+        return getenv('SITE_URI') . $this->getUrlPath($withParams);
+    }
+
+    public function getUrlRegex()
+    {
+        if (!$this->hasUrlParams()) {
+            return "/$this->url/";
         }
 
         $varPattern = self::VAR_PATTERN;
-        $regex = str_replace('/', '\/', preg_replace("/\{$varPattern}/", $varPattern, $this->uri));
+        $regex = str_replace('/', '\/', preg_replace("/\{$varPattern}/", $varPattern, $this->url));
 
         return "/$regex/";
     }
@@ -133,64 +143,64 @@ class Route
     /**
      * @return bool
      */
-    private function hasUriParams(): bool
+    private function hasUrlParams(): bool
     {
         $varPattern = self::VAR_PATTERN;
 
-        return (bool)preg_match("/\{$varPattern}/", $this->uri);
+        return (bool)preg_match("/\{$varPattern}/", $this->url);
     }
 
     /**
      * @return array
      */
-    public function getUriParams(): array
+    public function getUrlParams(): array
     {
-        if (!$this->hasUriParams()) {
+        if (!$this->hasUrlParams()) {
             return [];
         }
 
         $varPattern = self::VAR_PATTERN;
-        preg_match_all("/\{($varPattern)}/U", $this->uri, $matches);
+        preg_match_all("/\{($varPattern)}/U", $this->url, $matches);
 
         return isset($matches[1]) ? $matches[1] : [];
     }
 
     /**
-     * @param string $uri
+     * @param string $url
      * @return bool
      * @throws \Exception
      */
-    public function checkUriMatch(string $uri)
+    public function checkUrlMatch(string $url)
     {
-        if (!$this->hasUriParams()) {
-            return $this->getUri() === $this->prepareUri($uri);
+        if (!$this->hasUrlParams()) {
+            return $this->getUrlPath() === $this->prepareUrl($url);
         }
 
-        $regex = $this->getUriRegex();
+        $regex = $this->getUrlRegex();
 
-        return (bool)preg_match($regex, $uri);
+        return (bool)preg_match($regex, $url);
     }
 
     /**
-     * @param string $uri
+     * @param string $url
      * @return bool
      * @throws \Exception
      */
-    public function mapParams(string $uri)
+    public function mapParams(string $url)
     {
-        if (!$this->checkUriMatch($uri)) {
+        if (!$this->checkUrlMatch($url)) {
             //todo: throw more specific exception
-            throw new \Exception("Uri doesn't match.");
+            throw new \Exception("URL doesn't match.");
         }
 
-        if (!$this->hasUriParams()) {
+        if (!$this->hasUrlParams()) {
             return true;
         }
 
         $varPattern = self::VAR_PATTERN;
-        $regex = str_replace('/', '\/', preg_replace("/\{$varPattern}/", "($varPattern)", $this->uri));
+        $regex = str_replace('/', '\/', preg_replace("/\{$varPattern}/", "($varPattern)", $this->url));
 
-        preg_match_all("/$regex/", $uri, $matches);
+        preg_match_all("/$regex/", $url, $matches);
 
         if (empty($matches)) {
             return false;
@@ -198,7 +208,7 @@ class Route
 
         unset($matches[0]);
         $matches = array_values($matches);
-        $paramsNames = $this->getUriParams();
+        $paramsNames = $this->getUrlParams();
 
         foreach ($matches as $key => $match) {
             $this->params[$paramsNames[$key]] = $match[0];
@@ -209,10 +219,11 @@ class Route
 
     /**
      * @param string $paramName
+     * @param null $default
      * @return mixed|null
      */
-    public function getParam(string $paramName)
+    public function getParam(string $paramName, $default = null)
     {
-        return $this->params[$paramName] ?? null;
+        return $this->params[$paramName] ?? $default;
     }
 }

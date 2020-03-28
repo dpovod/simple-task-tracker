@@ -23,7 +23,7 @@ class Request
     ];
 
     /** @var string */
-    private $uri;
+    private $uri_path;
 
     /** @var string */
     private $method;
@@ -42,19 +42,19 @@ class Request
 
     /**
      * Request constructor.
-     * @param string $uri
+     * @param string $uriPath
      * @param string $method
      * @param array $getParams
      * @param array $postParams
      * @throws MethodNotAllowedException
      */
-    public function __construct(string $uri, string $method, array $getParams = [], array $postParams = [])
+    public function __construct(string $uriPath, string $method, array $getParams = [], array $postParams = [])
     {
         if (!$this->isMethodAllowed($method)) {
             throw new MethodNotAllowedException();
         }
 
-        $this->uri = $uri;
+        $this->uri_path = $uriPath;
         $this->method = $method;
         $this->getParams = $getParams;
         $this->postParams = $postParams;
@@ -68,9 +68,9 @@ class Request
     public static function makeFromGlobalRequestVariables(array $globalServer): self
     {
         $method = $globalServer['REQUEST_METHOD'];
-        $uri = $globalServer['REQUEST_URI'];
+        $uriPath = parse_url($globalServer['REQUEST_URI'], PHP_URL_PATH);
 
-        return new self($uri, $method, $_GET, $_POST);
+        return new self($uriPath, $method, $_GET, $_POST);
     }
 
     /**
@@ -85,9 +85,9 @@ class Request
     /**
      * @return string
      */
-    public function getUri(): string
+    public function getUriPath(): string
     {
-        return $this->uri;
+        return $this->uri_path;
     }
 
     /**
@@ -104,6 +104,16 @@ class Request
     public function getGetParams(): array
     {
         return $this->getParams;
+    }
+
+    /**
+     * @param string $key
+     * @param null $default
+     * @return mixed|null
+     */
+    public function getGetParam(string $key, $default = null)
+    {
+        return $this->getParams[$key] ?? $default;
     }
 
     /**
@@ -144,7 +154,7 @@ class Request
      */
     public function setCurrentRoute(Route $currentRoute): void
     {
-        $currentRoute->mapParams($this->getUri());
+        $currentRoute->mapParams($this->getUriPath());
         $this->currentRoute = $currentRoute;
     }
 }

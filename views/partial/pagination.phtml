@@ -1,0 +1,9 @@
+<?php /** @var array $pagination_links */ ?>
+<?php /** @var int $total_count */ ?>
+<nav aria-label="Page navigation example">
+	<ul class="pagination">
+		<?php foreach ($pagination_links as $key => $link): ?>
+		<li class="page-item"><a class="page-link" href="<?= $link ?>"><?= $key + 1 ?></a></li>
+        <?php endforeach; ?>
+	</ul>
+</nav>

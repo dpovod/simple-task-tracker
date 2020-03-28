@@ -33,7 +33,7 @@ class RouteResolver
     public function resolve(Request $request)
     {
         foreach ($this->routeStorage->getRoutes() as $route) {
-            if ($route->checkUriMatch($request->getUri()) && $route->getMethod() === $request->getMethod()) {
+            if ($route->checkUrlMatch($request->getUriPath()) && $route->getMethod() === $request->getMethod()) {
                 if (!method_exists($route->getController(), $route->getAction())) {
                     throw new NotFoundException();
                 }

@@ -34,8 +34,8 @@ class Redirector
             throw new NotFoundException("Route '$routeName' not found.");
         }
 
-        $uri = getenv('SITE_URI') . $route->getUri($withParams);
-        header("Location: $uri");
+        $url = $route->getFullUrl($withParams);
+        header("Location: $url");
         exit;
     }
 }

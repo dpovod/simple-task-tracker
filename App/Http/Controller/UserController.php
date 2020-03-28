@@ -7,7 +7,9 @@ use App\Exception\Http\NotFoundException;
 use App\Exception\Model\AttributeNotExistsException;
 use App\Http\Controller\Base\BaseController;
 use App\Http\Request\Request;
+use App\Model\User;
 use App\Repository\UserRepository;
+use App\Support\Collection\PaginatedCollection;
 
 /**
  * Class UserController
@@ -16,14 +18,26 @@ use App\Repository\UserRepository;
 class UserController extends BaseController
 {
     /**
-     * @throws \ReflectionException
+     * @param Request $request
+     * @return mixed
      * @throws AttributeNotExistsException
+     * @throws \ReflectionException
+     * @throws \Exception
      */
-    public function listUsers()
+    public function listUsers(Request $request)
     {
-        //@todo: pagination
-        $users = (new UserRepository())->getList();
-        return $this->renderView(BASE_PATH . '/views/users/list.phtml', compact('users'));
+        $users = PaginatedCollection::makeFromModel(
+            User::class,
+            $request->getCurrentRoute()->getFullUrl(),
+            (int)$request->getGetParam('page', 1),
+            5
+        );
+
+        return $this->renderView(BASE_PATH . '/views/users/list.phtml', [
+            'users' => $users->getItems(),
+            'pagination_links' => $users->getPaginationLinks(),
+            'total_count' => $users->getTotalCount()
+        ]);
     }
 
     /**
