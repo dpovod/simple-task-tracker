@@ -1,8 +1,10 @@
 <?php
 
 use App\Model\User;
+use App\Support\Pagination\Pagination;
 
 /** @var User[] $users */
+/** @var Pagination $pagination */
 ?>
 <div class="container mt-5">
 	<h3 class="pt-4">Users</h3>
@@ -28,7 +30,7 @@ use App\Model\User;
 			</tbody>
 		</table>
 		<div class="container">
-            <?php if (!empty($pagination_links)) : ?>
+            <?php if ($pagination->getPagesCount() > 1) : ?>
                 <?php require_once BASE_PATH . '/views/partial/pagination.phtml';?>
             <?php endif; ?>
 		</div>

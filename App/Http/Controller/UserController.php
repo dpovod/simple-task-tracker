@@ -9,7 +9,7 @@ use App\Http\Controller\Base\BaseController;
 use App\Http\Request\Request;
 use App\Model\User;
 use App\Repository\UserRepository;
-use App\Support\Collection\PaginatedCollection;
+use App\Support\Pagination\PaginatedCollection;
 
 /**
  * Class UserController
@@ -35,8 +35,7 @@ class UserController extends BaseController
 
         return $this->renderView(BASE_PATH . '/views/users/list.phtml', [
             'users' => $users->getItems(),
-            'pagination_links' => $users->getPaginationLinks(),
-            'total_count' => $users->getTotalCount()
+            'pagination' => $users->getPagination(),
         ]);
     }
 

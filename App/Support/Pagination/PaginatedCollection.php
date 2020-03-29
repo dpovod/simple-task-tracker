@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Support\Collection;
+namespace App\Support\Pagination;
 
 use App\Exception\Model\AttributeNotExistsException;
 use App\Helpers\ConfigHelper;
@@ -10,30 +10,44 @@ use App\Repository\Base\BaseRepository;
 
 class PaginatedCollection
 {
+    /** @var array */
     private $items = [];
 
+    /** @var int */
     private $total_count = 0;
 
+    /** @var int */
+    private $page;
+
+    /** @var int */
     private $on_page;
 
+    /** @var int */
+    private $pages_count;
+
+    /** @var string */
     private $list_link;
 
-    private $pagination_links = [];
+    /** @var Pagination */
+    private $pagination;
 
     /**
      * PaginatedCollection constructor.
      * @param array $items
      * @param int $totalCount
-     * @param $listLink
+     * @param string $listLink
+     * @param int $page
      * @param int $onPage
      */
-    public function __construct(array $items, int $totalCount, $listLink, int $onPage = 10)
+    public function __construct(array $items, int $totalCount, string $listLink, int $page = 1, int $onPage = 10)
     {
         $this->items = $items;
         $this->total_count = $totalCount;
         $this->list_link = $listLink;
+        $this->page = $page;
         $this->on_page = $onPage;
-        $this->pagination_links = $this->generatePaginationLinks();
+        $this->pages_count = (int)ceil($this->total_count / $this->on_page);
+        $this->pagination = $this->generatePagination();
     }
 
     /**
@@ -54,7 +68,7 @@ class PaginatedCollection
         $items = $repository->getListPaginated($onPage, $onPage * ($page - 1));
         $totalCount = $repository->getCount();
 
-        return new static($items, $totalCount, $listLink, $onPage);
+        return new static($items, $totalCount, $listLink, $page, $onPage);
     }
 
     /**
@@ -62,11 +76,17 @@ class PaginatedCollection
      */
     private function generatePaginationLinks(): array
     {
-        $pagesCount = (int)ceil($this->total_count / $this->on_page);
+        return array_map(function ($pageNumber) {
+            return new PaginationLink($pageNumber, "$this->list_link?page=$pageNumber");
+        }, range(1, $this->pages_count));
+    }
 
-        return array_map(function ($page) {
-            return "$this->list_link?page=$page";
-        }, range(1, $pagesCount));
+    /**
+     * @return Pagination
+     */
+    private function generatePagination()
+    {
+        return new Pagination($this->page, $this->on_page, $this->pages_count, $this->generatePaginationLinks());
     }
 
     /**
@@ -137,10 +157,10 @@ class PaginatedCollection
     }
 
     /**
-     * @return array
+     * @return Pagination
      */
-    public function getPaginationLinks(): array
+    public function getPagination()
     {
-        return $this->pagination_links;
+        return $this->pagination;
     }
 }

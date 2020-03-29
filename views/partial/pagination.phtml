@@ -1,9 +1,15 @@
-<?php /** @var array $pagination_links */ ?>
-<?php /** @var int $total_count */ ?>
+<?php
+
+use App\Support\Pagination\Pagination;
+
+/** @var Pagination $pagination */
+?>
 <nav aria-label="Page navigation example">
 	<ul class="pagination">
-		<?php foreach ($pagination_links as $key => $link): ?>
-		<li class="page-item"><a class="page-link" href="<?= $link ?>"><?= $key + 1 ?></a></li>
+        <?php foreach ($pagination->getPaginationLinks() as $key => $link): ?>
+			<li class="page-item <?= $pagination->getPage() === $link->getPageNumber() ? 'active' : ''; ?>">
+				<a class="page-link" href="<?= $link->getLink() ?>"><?= $link->getPageNumber() ?></a>
+			</li>
         <?php endforeach; ?>
 	</ul>
 </nav>
